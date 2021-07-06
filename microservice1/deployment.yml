@@ -1,0 +1,125 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+        name: queue-dep
+        labels:
+               type: deplyoment
+
+spec:
+      template:
+              metadata:
+                      labels:
+                           app: queue-pod
+              spec:
+                  containers:
+                         - name: queue
+                           image: richardchesterwood/k8s-fleetman-queue:release2
+      replicas: 1
+      selector:
+               matchLabels:
+                       app: queue-pod
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+        name: ps-dep
+        labels:
+                type: deployment
+spec:
+        template:
+                metadata:
+                        labels:
+                                app: ps-pod
+                spec:
+                        containers:
+                                - name: position-simulator
+                                  image: richardchesterwood/k8s-fleetman-position-simulator:release2
+                                  env:
+                                    - name: SPRING_PROFILES_ACTIVE
+                                      value: production-microservice
+
+        replicas: 1
+        selector:
+                 matchLabels:
+                         app: ps-pod
+      
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+        name: pt
+        labels:
+                type: deployment
+spec:
+        template:
+                metadata:
+                        labels:
+                                app: pt-pod
+                spec:
+                        containers:
+                                - name: position-tracker
+                                  image: richardchesterwood/k8s-fleetman-position-tracker:release3
+                                  env:
+                                    - name: SPRING_PROFILES_ACTIVE
+                                      value: production-microservice
+
+        replicas: 1
+        selector:
+                matchLabels:
+                        app: pt-pod
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+        name: webapp
+        labels:
+                type: deployment
+spec:
+        template:
+                metadata:
+                        labels:
+                                app: web-pod
+                spec:
+                        containers:
+                                - name: webapp
+                                  image: richardchesterwood/k8s-fleetman-webapp-angular:release2
+                                  env:
+                                    - name: SPRING_PROFILES_ACTIVE
+                                      value: production-microservice
+
+        replicas: 1
+        selector:
+                matchLabels:
+                        app: web-pod
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+        name: gateway
+        labels:
+                type: deployment
+spec:
+        template:
+                metadata:
+                        labels:
+                                app: gateway-pod
+                spec:
+                        containers:
+                                - name: api-gateway
+                                  image: richardchesterwood/k8s-fleetman-api-gateway:release2
+                                  env:
+                                    - name: SPRING_PROFILES_ACTIVE
+                                      value: production-microservice
+        replicas: 1
+        selector:
+                matchLabels:
+                        app: gateway-pod
+      
+
+
+
+
